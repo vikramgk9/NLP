@@ -11,10 +11,10 @@ needed <- c('httr', 'XML', 'rvest', 'xml2', 'RCurl', 'tidyverse', 'tidytext', 'g
             'purrr', 'tm', 'lubridate', 'Scale', 'reshape2', 'wordcloud', 'RColorBrewer', 'syuzhet', 'dbplyr')      
 installIfAbsentAndLoad(needed)
 
-url_base <- ("https://mason-happyplanet.socialsimulator.com/twupdates/?page=%d")
+url_base <- ("https://<url>/?page=%d")
 map_df(1:39, function(i) {
   cat("scraped!")
-  url_content <- getURLContent("https://mason-happyplanet.socialsimulator.com/twupdates/?page=%d", userpwd="hpb14:virginia021814", httpauth = 1L)
+  url_content <- getURLContent("https://<url>/?page=%d", userpwd="user:password", httpauth = 1L)
   pg <- read_html(url_content, i)
   
   data.frame(Reviews=html_text(html_nodes(pg, ".entry-content")),
@@ -24,21 +24,21 @@ map_df(1:39, function(i) {
 
 write.table(df, file = "newreviews.csv")
 
-dataset = read.csv('newreviews.csv', na.strings = c("", "NA"), stringsAsFactors = FALSE)
+dataset <- read.csv('newreviews.csv', na.strings = c("", "NA"), stringsAsFactors = FALSE)
 dataset <- data.frame(dataset[-grep('exercise' ,dataset$Reviews, perl=T),])
 colnames(dataset) [1] <- c("Reviews")
 dataset <- data.frame(dataset[-grep('web' ,dataset$Reviews, perl=T),])
 colnames(dataset) [1] <- c("Reviews")
-corpus = VCorpus(VectorSource(dataset$Reviews))
-corpus = tm_map(corpus, content_transformer(tolower))
-corpus = tm_map(corpus, removeNumbers)
-corpus = tm_map(corpus, removePunctuation)
-corpus = tm_map(corpus, removeWords, c(stopwords(),"hpb"))
-corpus = tm_map(corpus, stemDocument)
-corpus = tm_map(corpus, stripWhitespace)
-dtm = DocumentTermMatrix(corpus)
-dtm = removeSparseTerms(dtm, 0.999)
-mat = as.matrix(dtm)
+corpus <- VCorpus(VectorSource(dataset$Reviews))
+corpus <- tm_map(corpus, content_transformer(tolower))
+corpus <- tm_map(corpus, removeNumbers)
+corpus <- tm_map(corpus, removePunctuation)
+corpus <- tm_map(corpus, removeWords, c(stopwords(),"hpb"))
+corpus <- tm_map(corpus, stemDocument)
+corpus <- tm_map(corpus, stripWhitespace)
+dtm <- DocumentTermMatrix(corpus)
+dtm <- removeSparseTerms(dtm, 0.999)
+mat <- as.matrix(dtm)
 v <- sort(colSums(mat),decreasing=TRUE)
 data <- data.frame(word = names(v),freq=v)
 
